@@ -42,8 +42,8 @@ public class WebSecurityConfig {
         return http.authorizeHttpRequests(authorize -> {
                             authorize.requestMatchers(AUTH_SWAGGER_LIST).permitAll();
                             authorize.requestMatchers(HttpMethod.POST, "/v1/auth").permitAll();
-                            authorize.requestMatchers("/v1/auth/**").hasAnyAuthority("CLIENT_READ_WRITE", "ADMIN_READ", "ADMIN_WRITE");
-                            authorize.anyRequest().hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE");
+                            authorize.requestMatchers("/v1/auth/**").hasAnyAuthority("client_read_write", "admin_read", "admin_write");
+                            authorize.anyRequest().hasAnyAuthority("admin_read", "admin_write");
                         }
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder())))

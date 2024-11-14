@@ -121,7 +121,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         LocalDateTime timeout = userRecoveryCode.getCreationDate().plusMinutes(Long.parseLong(recoveryCodeTimeout));
         LocalDateTime now = LocalDateTime.now();
 
-        return recoveryCode.equals(userRecoveryCode.getCode()) && now.isBefore(timeout);
+        if (!(recoveryCode.equals(userRecoveryCode.getCode()) && now.isBefore(timeout))) {
+            throw new BadRequestException("Code is Invalid or expired");
+        }
+
+        return true;
     }
 
     @Override
@@ -129,7 +133,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (recoveryCodeIsValid(userDetailsDto.getRecoveryCode(), userDetailsDto.getEmail())) {
             var userRepresentation = getUserRepresentationUpdated(userDetailsDto.getPassword());
-            updateAuthUser(userRepresentation, userRepresentation.getEmail());
+            updateAuthUser(userRepresentation, userDetailsDto.getEmail());
         }
     }
 

@@ -35,7 +35,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/recovery-code/send",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize(value = "hasAnyAuthority('CLIENT_READ_WRITE','ADMIN_READ','ADMIN_WRITE')")
+    @PreAuthorize(value = "hasAnyAuthority('client_read_write','admin_read','admin_write')")
     public ResponseEntity<Void> sendRecoveryCode(@RequestBody @Valid UserRecoveryCode dto) {
         authenticationService.sendRecoveryCode(dto.getEmail());
         return ResponseEntity.noContent().build();
@@ -43,7 +43,7 @@ public class AuthenticationController {
 
 
     @GetMapping(value = "/recovery-code")
-    @PreAuthorize(value = "hasAnyAuthority('CLIENT_READ_WRITE','ADMIN_READ','ADMIN_WRITE')")
+    @PreAuthorize(value = "hasAnyAuthority('client_read_write','admin_read','admin_write')")
     public ResponseEntity<Void> recoveryCodeIsValid(@RequestParam("recoveryCode") String recoveryCode,
                                                  @RequestParam("email") String email) {
         authenticationService.recoveryCodeIsValid(recoveryCode, email);
@@ -52,21 +52,21 @@ public class AuthenticationController {
 
 
     @PatchMapping(value = "/recovery-code/password", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize(value = "hasAnyAuthority('CLIENT_READ_WRITE','ADMIN_READ','ADMIN_WRITE')")
+    @PreAuthorize(value = "hasAnyAuthority('client_read_write','admin_read','admin_write')")
     public ResponseEntity<Void> updatePasswordByRecoveryCode(@RequestBody @Valid UserDetailsDto dto) {
         authenticationService.updatePasswordByRecoveryCode(dto);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/representations/credentials")
-    @PreAuthorize(value = "hasAnyAuthority('ADMIN_READ','ADMIN_WRITE')")
+    @PreAuthorize(value = "hasAnyAuthority('admin_read','admin_write')")
     public ResponseEntity<Void> createAuthUser(@Valid @RequestBody UserRepresentationDto dto) {
         authenticationService.createAuthUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/representations/credentials/{email}")
-    @PreAuthorize(value = "hasAnyAuthority('ADMIN_READ','ADMIN_WRITE')")
+    @PreAuthorize(value = "hasAnyAuthority('admin_read','admin_write')")
     public ResponseEntity<Void> updateAuthUser(@Valid @RequestBody UserRepresentationDto dto, @PathVariable("email") String email) {
         authenticationService.updateAuthUser(dto, email);
         return ResponseEntity.noContent().build();
