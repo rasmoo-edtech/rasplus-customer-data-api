@@ -54,9 +54,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private UserRecoveryCodeRepository userRecoveryCodeRepository;
 
     @Autowired
-    private AuthenticationService authenticationService;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
 
@@ -199,7 +196,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         login.setClientSecret(clientSecret);
         login.setGrantType(grantType);
 
-        Map<String, String> clientCredentialsResponse = objectMapper.readValue(authenticationService.auth(login), Map.class);
+        Map<String, String> clientCredentialsResponse = objectMapper.readValue(auth(login), Map.class);
         return clientCredentialsResponse.get("access_token");
     }
 

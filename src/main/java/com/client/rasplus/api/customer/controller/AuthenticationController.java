@@ -2,6 +2,7 @@ package com.client.rasplus.api.customer.controller;
 
 import com.client.rasplus.api.customer.dto.LoginDto;
 import com.client.rasplus.api.customer.dto.UserDetailsDto;
+import com.client.rasplus.api.customer.dto.UserRepresentationDto;
 import com.client.rasplus.api.customer.model.UserRecoveryCode;
 import com.client.rasplus.api.customer.service.AuthenticationService;
 import jakarta.validation.Valid;
@@ -12,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/v1/auth")
 public class AuthenticationController {
 
     @Autowired
@@ -52,6 +55,20 @@ public class AuthenticationController {
     @PreAuthorize(value = "hasAnyAuthority('CLIENT_READ_WRITE','ADMIN_READ','ADMIN_WRITE')")
     public ResponseEntity<Void> updatePasswordByRecoveryCode(@RequestBody @Valid UserDetailsDto dto) {
         authenticationService.updatePasswordByRecoveryCode(dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/representations/credentials")
+    @PreAuthorize(value = "hasAnyAuthority('ADMIN_READ','ADMIN_WRITE')")
+    public ResponseEntity<Void> createAuthUser(@Valid @RequestBody UserRepresentationDto dto) {
+        authenticationService.createAuthUser(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("/representations/credentials/{email}")
+    @PreAuthorize(value = "hasAnyAuthority('ADMIN_READ','ADMIN_WRITE')")
+    public ResponseEntity<Void> updateAuthUser(@Valid @RequestBody UserRepresentationDto dto, @PathVariable("email") String email) {
+        authenticationService.updateAuthUser(dto, email);
         return ResponseEntity.noContent().build();
     }
 }
