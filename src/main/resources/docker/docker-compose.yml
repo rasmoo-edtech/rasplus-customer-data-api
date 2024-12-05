@@ -45,6 +45,18 @@ services:
     networks:
       - keycloak_network
 
+  rabbitmq:
+    image: rabbitmq:3-management # Imagem oficial com interface de gerenciamento
+    container_name: rabbitmq_container
+    ports:
+      - "5672:5672" # Porta para conexões com clientes (AMQP)
+      - "15672:15672" # Porta para a interface de gerenciamento
+    environment:
+      RABBITMQ_DEFAULT_USER: admin # Usuário padrão
+      RABBITMQ_DEFAULT_PASS: admin123 # Senha padrão
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq # Persistência de dados
+
 networks:
   keycloak_network:
     driver: bridge
@@ -53,3 +65,4 @@ volumes:
   mysql_data_container:
   redis_data_container:
   keycloak_data_container:
+  rabbitmq_data:
