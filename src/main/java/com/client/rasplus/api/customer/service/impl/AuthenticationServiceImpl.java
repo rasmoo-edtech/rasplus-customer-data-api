@@ -13,6 +13,8 @@ import com.client.rasplus.api.customer.service.AuthenticationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -52,6 +54,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Autowired
     private UserRecoveryCodeRepository userRecoveryCodeRepository;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -103,8 +108,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRecoveryCode.setCreationDate(LocalDateTime.now());
 
         userRecoveryCodeRepository.save(userRecoveryCode);
-        //TODO: replaced by rabbit
-       //mailIntegration.send(email, "Código de recuperação de conta: "+code, "Código de recuperação de conta");
+        try {
+            Message message = new Message(objectMapper.writeValueAsBytes(userRecoveryCode));
+            rabbitTemplate.send("recovery.code.email", message);
+        } catch (JsonProcessingException j) {
+            throw new BadRequestException(j.getMessage());
+        }
     }
 
     @Override
