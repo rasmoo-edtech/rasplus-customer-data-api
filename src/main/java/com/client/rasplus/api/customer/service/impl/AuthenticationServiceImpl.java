@@ -107,7 +107,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRecoveryCode.setCreationDate(LocalDateTime.now());
 
         userRecoveryCodeRepository.save(userRecoveryCode);
-        rabbitTemplate.convertAndSend("recovery.code.email", userRecoveryCode.toDTO());
+        rabbitTemplate.convertAndSend("recovery.code.ex","", userRecoveryCode.toDTO());
 
     }
 
