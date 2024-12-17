@@ -1,5 +1,6 @@
 package com.client.rasplus.api.customer.model;
 
+import com.client.rasplus.api.customer.dto.UserRecoveryCodeDto;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +29,10 @@ public class UserRecoveryCode {
     private String code;
 
     private LocalDateTime creationDate = LocalDateTime.now();
+
+
+    public UserRecoveryCodeDto toDTO() {
+        return new UserRecoveryCodeDto(email, code, creationDate);
+    }
 
 }

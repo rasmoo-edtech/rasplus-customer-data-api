@@ -13,7 +13,6 @@ import com.client.rasplus.api.customer.service.AuthenticationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,7 +80,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             );
             return response.getBody();
         } catch (Exception e) {
-            throw new BadRequestException("Erro ao formatar token - "+e.getMessage());
+            throw new BadRequestException("Erro ao formatar token - " + e.getMessage());
         }
     }
 
@@ -108,12 +107,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRecoveryCode.setCreationDate(LocalDateTime.now());
 
         userRecoveryCodeRepository.save(userRecoveryCode);
-        try {
-            Message message = new Message(objectMapper.writeValueAsBytes(userRecoveryCode));
-            rabbitTemplate.send("recovery.code.email", message);
-        } catch (JsonProcessingException j) {
-            throw new BadRequestException(j.getMessage());
-        }
+        rabbitTemplate.convertAndSend("recovery.code.email", userRecoveryCode.toDTO());
+
     }
 
     @Override
@@ -164,7 +159,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
 
-
     @Override
     public void updateAuthUser(UserRepresentationDto userRepresentation, String currentEmail) {
         try {
@@ -173,11 +167,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             String userId = getUserAuthId(currentEmail, headers);
             HttpEntity<UserRepresentationDto> request = new HttpEntity<>(userRepresentation, headers);
             httpComponent.restTemplate().put(
-                    keycloakUri + "/admin/realms/REALM_RASPLUS_API/users/"+userId,
+                    keycloakUri + "/admin/realms/REALM_RASPLUS_API/users/" + userId,
                     request
             );
 
-        } catch (Exception e ) {
+        } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
 
@@ -196,7 +190,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 uriVariables
         ).getBody();
 
-        List<Map<String,Object>> users = objectMapper.readValue(responseGetUser, new TypeReference<List<Map<String, Object>>>() {});
+        List<Map<String, Object>> users = objectMapper.readValue(responseGetUser, new TypeReference<List<Map<String, Object>>>() {
+        });
         if (users.isEmpty()) {
             throw new BadRequestException("Erro to get user");
         }
@@ -216,7 +211,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private static HttpHeaders getHttpHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer "+ accessToken);
+        headers.set("Authorization", "Bearer " + accessToken);
         return headers;
     }
 
